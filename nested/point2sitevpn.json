@@ -31,8 +31,8 @@
     "subnetName": "GatewaySubnet",
     "subnetAddressRange": "10.99.255.0/24",
 
-    "gatewayName": "p2sGateway",
-    "gatewayPublicIPName": "p2sGateway-pip')]",
+    "gatewayName": "vpnGateway",
+    "gatewayPublicIPName": "vpnGateway-pip",
     "gatewayDomainNameLabel": "lsbpvpn-test1",
 
     "gatewaySku": "Basic",

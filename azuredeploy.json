@@ -41,11 +41,14 @@
       "defaultValue": ""
     }
   },
+  "variables": {
+    "deploymentsApi": "2017-05-10"
+  },
   "resources": [
     {
       "type": "Microsoft.Resources/deployments",
       "name": "point2siteVpn",
-      "apiVersion": "2017-05-10",
+      "apiVersion": "[variables('deploymentsApi')]",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -62,7 +65,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "name": "activeDirectory",
-      "apiVersion": "2017-05-10",
+      "apiVersion": "[variables('deploymentsApi')]",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -85,7 +88,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "name": "remoteDesktop",
-      "apiVersion": "2017-05-10",
+      "apiVersion": "[variables('deploymentsApi')]",
       "dependsOn": [
         "Microsoft.Resources/deployments/activeDirectory"
       ],
