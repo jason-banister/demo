@@ -32,7 +32,7 @@
     "subnetAddressRange": "10.99.255.0/24",
 
     "gatewayName": "p2sGateway",
-    "gatewayPublicIPName": "[concat(variables(gatewayName),'-pip']",
+    "gatewayPublicIPName": "[concat(variables(gatewayName),'-pip')]",
     "gatewayDomainNameLabel": "lsbpvpn-test1",
 
     "gatewaySku": "Basic",
