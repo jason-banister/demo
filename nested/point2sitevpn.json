@@ -32,7 +32,7 @@
     "subnetAddressRange": "10.99.255.0/24",
 
     "gatewayName": "p2sGateway",
-    "gatewayPublicIPName": "[concat(variables(gatewayName),'-pip')]",
+    "gatewayPublicIPName": "p2sGateway-pip')]",
     "gatewayDomainNameLabel": "lsbpvpn-test1",
 
     "gatewaySku": "Basic",
@@ -44,8 +44,8 @@
     "revokedCertName": "RevokedCerts",
     "revokedCertThumbprint": "",
 
-    "vNetworkID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('vNetworkName'))]",
-    "gatewaySubnetRef": "[concat(variables('vnetID'),'/subnets/','GatewaySubnet')]"
+    "vNetworkID": "[resourceId('Microsoft.Network/virtualNetworks',variables('vNetworkName'))]",
+    "gatewaySubnetRef": "[concat(variables('vNetworkID'),'/subnets/','GatewaySubnet')]"
   },
   "resources": [
     {
