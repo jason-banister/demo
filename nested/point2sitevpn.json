@@ -1,0 +1,149 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "trustedAuthCA": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Certificate Authority public certificate for the CA that generates user certificates"
+      }
+    },
+    "_artifactsLocation": {
+      "type": "string",
+      "metadata": {
+        "description": "The location of resources, such as templates and DSC modules, that the template depends on"
+      },
+      "defaultValue": "https://raw.githubusercontent.com/jason-banister/demo/master"
+    },
+    "_artifactsLocationSasToken": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Auto-generated token to access _artifactsLocation"
+      },
+      "defaultValue": ""
+    }
+  },
+  "variables": {
+    "apiVersion": "2017-05-10",
+
+    "vNetworkName": "production-vnet",
+    "vNetworkAddressRange": "10.99.0.0/16",
+    "subnetName": "GatewaySubnet",
+    "subnetAddressRange": "10.99.255.0/24",
+
+    "gatewayName": "p2sGateway",
+    "gatewayPublicIPName": "[concat(variables(gatewayName),'-pip']",
+    "gatewayDomainNameLabel": "lsbpvpn-test1",
+
+    "gatewaySku": "Basic",
+
+    "vpnClientAddressPoolPrefix": "172.16.255.0/24",
+
+    "clientRootCertName": "RootCert",
+    "clientRootCertData": "[parameters(trustedCertAuth)]",
+    "revokedCertName": "RevokedCerts",
+    "revokedCertThumbprint": "",
+
+    "vNetworkID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('vNetworkName'))]",
+    "gatewaySubnetRef": "[concat(variables('vnetID'),'/subnets/','GatewaySubnet')]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "name": "vNetwork",
+      "apiVersion": "[variables('apiVersion')]",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(parameters('_artifactsLocation'), '/shared/vnet.json', parameters('_artifactsLocationSasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vNetworkName": {
+            "value": "[variables('vNetworkName')]"
+          },
+          "vNetworkAddressRange": {
+            "value": "[variables('vNetworkAddressRange')]"
+          },
+          "subnetName": {
+            "value": "[variables('subnetName')]"
+          },
+          "subnetAddressRange": {
+            "value": "[variables('subnetAddressRange')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[variables('gatewayPublicIPName')]",
+      "apiVersion": "[variables('apiVersion')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "Microsoft.Resources/deployments/vNetwork"
+      ],
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic",
+        "dnsSettings": {
+          "domainNameLabel": "[variables('gatewayDomainNameLabel')]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworkGateways",
+      "name": "[variables('gatewayName')]",
+      "apiVersion": "[variables('apiVersion')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('gatewayPublicIPName'))]",
+        "Microsoft.Resources/deployments/vNetwork"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "vnetGatewayConfig",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[variables('subnetID')]"
+              },
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('gatewayPublicIPName'))]"
+              }
+            }
+          }
+        ],
+        "gatewayType": "Vpn",
+        "vpnType": "RouteBased",
+        "enableBgp": "false",
+        "sku": {
+          "name": "[variables('gatewaySku')]",
+          "tier": "[variables('gatewaySku')]"
+        },
+        "vpnClientConfiguration": {
+          "vpnClientAddressPool": {
+            "addressPrefixes": [
+              "[variables('vpnClientAddressPoolPrefix')]"
+            ]
+          },
+          "vpnClientRootCertificates": [
+            {
+              "name": "[variables('clientRootCertName')]",
+              "properties": {
+                "PublicCertData": "[variables('clientRootCertData')]"
+              }
+            }
+          ],
+          "vpnClientRevokedCertificates": [
+            {
+              "name": "[variables('revokedCertName')]",
+              "properties": {
+                "Thumbprint": "[variables('revokedCertThumbprint')]"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
