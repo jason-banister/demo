@@ -36,12 +36,12 @@
     }
   },
   "variables": {
-    "vmName": "dc01",
+    "vmName": "dc",
     "vNetworkName": "production-vnet",
     "vNetworkAddressRange": "10.199.0.0/16",
     "subnetName": "admin-subnet",
     "subnetAddressRange": "10.199.1.0/24",
-    "interfaceName": "[concat(variables(''), '-if']",
+    "interfaceName": "[concat(variables('vmName'), '-if']",
     "interfaceIPAddress": "10.0.0.1"
   },
   "resources": [
