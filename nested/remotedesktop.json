@@ -67,7 +67,7 @@
       "metadata": {
         "description": "The number of session hosts to be deployed in the Default Collection"
       },
-      "defaultValue": "1"
+      "defaultValue": 1
     },
     "_artifactsLocation": {
       "type": "string",
