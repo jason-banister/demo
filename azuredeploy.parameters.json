@@ -8,7 +8,7 @@
     "domainAdminPassword": {
       "value": "5up3R53cR3T"
     },
-    "domainName": {
+    "domainFqdn": {
       "value": "azure.relipxin.lan"
     },
     "trustedAuthCA": {

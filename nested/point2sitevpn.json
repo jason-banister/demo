@@ -8,6 +8,34 @@
         "description": "Certificate Authority public certificate for the CA that generates user certificates"
       }
     },
+    "vNetworkName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the vNet"
+      },
+      "defaultValue": "default-vnet"
+    },
+    "vNetworkAddressPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "The address range of the vNet in CIDR format"
+      },
+      "defaultValue": "10.99.0.0/16"
+    },
+    "subnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the subnet created in the vNet"
+      },
+      "defaultValue": "GatewaySubnet"
+    },
+    "subnetAddressPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "The address range of the subnet created in the vNet"
+      },
+      "defaultValue": "10.99.255.0/24"
+    },
     "_artifactsLocation": {
       "type": "string",
       "metadata": {
@@ -26,11 +54,6 @@
   "variables": {
     "networkApi": "2017-05-10",
 
-    "vNetworkName": "production-vnet",
-    "vNetworkAddressRange": "10.99.0.0/16",
-    "subnetName": "GatewaySubnet",
-    "subnetAddressRange": "10.99.255.0/24",
-
     "gatewayName": "vpnGateway",
     "gatewayPublicIPName": "vpnGateway-pip",
     "gatewayDomainNameLabel": "lsbpvpn-test1",
@@ -44,8 +67,8 @@
     "revokedCertName": "RevokedCerts",
     "revokedCertThumbprint": "",
 
-    "vNetworkID": "[resourceId('Microsoft.Network/virtualNetworks',variables('vNetworkName'))]",
-    "gatewaySubnetRef": "[concat(variables('vNetworkID'),'/subnets/','GatewaySubnet')]"
+    "vNetworkID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('vNetworkName'))]",
+    "gatewaySubnetRef": "[concat(parameters('vNetworkID'),'/subnets/','GatewaySubnet')]"
   },
   "resources": [
     {
@@ -60,16 +83,16 @@
         },
         "parameters": {
           "vNetworkName": {
-            "value": "[variables('vNetworkName')]"
+            "value": "[parameters('vNetworkName')]"
           },
           "vNetworkAddressRange": {
-            "value": "[variables('vNetworkAddressRange')]"
+            "value": "[parameters('vNetworkAddressRange')]"
           },
           "subnetName": {
-            "value": "[variables('subnetName')]"
+            "value": "GatewaySubnet"
           },
           "subnetAddressRange": {
-            "value": "[variables('subnetAddressRange')]"
+            "value": "10.99.255.0/24"
           }
         }
       }

@@ -6,7 +6,8 @@
       "type": "string",
       "metadata": {
         "description": "The name of the administrator account of the new VM"
-      }
+      },
+      "defaultValue": "LocalAdmin"
     },
     "localAdminPassword": {
       "type": "securestring",
@@ -18,7 +19,8 @@
       "type": "string",
       "metadata": {
         "description": "The name of the administrator account of the domain"
-      }
+      },
+      "defaultValue": "AzureAdmin"
     },
     "domainAdminPassword": {
       "type": "securestring",
@@ -31,6 +33,34 @@
       "metadata": {
         "description": "The FQDN of the Active Directory Domain to be created"
       }
+    },
+    "vNetworkName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the vNet"
+      },
+      "defaultValue": "default-vnet"
+    },
+    "vNetworkAddressPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "The address range of the vNet in CIDR format"
+      },
+      "defaultValue": "10.99.0.0/16"
+    },
+    "subnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the subnet created in the vNet"
+      },
+      "defaultValue": "DefaultSubnet"
+    },
+    "subnetAddressPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "The address range of the subnet created in the vNet"
+      },
+      "defaultValue": "10.99.1.0/24"
     },
     "_artifactsLocation": {
       "type": "string",
@@ -51,10 +81,6 @@
     "cbVmName": "rdcb",
     "gwVmName": "rdgw",
     "shVmName": "rdsh",
-    "vNetworkName": "production-vnet",
-    "vNetworkAddressRange": "10.199.0.0/16",
-    "subnetName": "rds-subnet",
-    "subnetAddressRange": "10.199.1.0/24",
     "gwDomainNameLabel": "lsbprdgw-test1",
     "gwPublicIPAddressName": "rdgw-pip",
     "gwLoadBalancerName": "gwLoadBalancer",
@@ -78,16 +104,16 @@
         },
         "parameters": {
           "vNetworkName": {
-            "value": "[variables('vNetworkName')]"
+            "value": "[parameters('vNetworkName')]"
           },
-          "vNetworkAddressRange": {
-            "value": "[variables('vNetworkAddressRange')]"
+          "vNetworkAddressPrefix": {
+            "value": "[parameters('vNetworkAddressPrefix')]"
           },
           "subnetName": {
-            "value": "[variables('subnetName')]"
+            "value": "[parameters('subnetName')]"
           },
           "subnetAddressRange": {
-            "value": "[variables('subnetAddressRange')]"
+            "value": "[parameters('subnetAddressRange')]"
           }
         }
       }
@@ -228,7 +254,7 @@
             "properties": {
               "privateIPAllocationMethod": "Dynamic",
               "subnet": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetworkName'), variables('subnetName'))]"
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vNetworkName'), parameters('subnetName'))]"
               }
             }
           }
@@ -296,7 +322,7 @@
               "ModulesUrl": "[concat(parameters('_artifactsLocation'), '/DSC/Configuration.zip', parameters('_artifactsLocationSasToken'))]",
               "ConfigurationFunction": "Configuration.ps1\\SessionHost",
               "Properties": {
-                "DomainName": "[parameters('domainName')]",
+                "DomainName": "[parameters('domainFqdn')]",
                 "AdminCredentials": {
                   "UserName": "[parameters('domainAdminUsername')]",
                   "Password": "PrivateSettingsRef:AdminPassword"
@@ -327,7 +353,7 @@
             "properties": {
               "privateIPAllocationMethod": "Dynamic",
               "subnet": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetworkName'), variables('subnetName'))]"
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vNetworkName'), parameters('subnetName'))]"
               }
             }
           }
@@ -390,7 +416,7 @@
             "properties": {
               "privateIPAllocationMethod": "Dynamic",
               "subnet": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetworkName'), variables('subnetName'))]"
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vNetworkName'), parameters('subnetName'))]"
               },
               "loadBalancerBackendAddressPools": [{
                 "id": "[variables('gwLoadBalancerBEAddressPoolID')]"

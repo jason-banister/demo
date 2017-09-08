@@ -2,11 +2,25 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "localAdminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the administrator account of the new VM"
+      },
+      "defaultValue": "LocalAdmin"
+    },
+    "localAdminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password for the administrator account of the new VM"
+      }
+    },
     "domainAdminUsername": {
       "type": "string",
       "metadata": {
         "description": "The name of the administrator account of the new AD VM and domain"
-      }
+      },
+      "defaultValue": "AzureAdmin"
     },
     "domainAdminPassword": {
       "type": "securestring",
@@ -25,6 +39,34 @@
       "metadata": {
         "description": "Certificate Authority public certificate for the CA that generates user certificates"
       }
+    },
+    "vNetworkName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the vNet"
+      },
+      "defaultValue": "default-vnet"
+    },
+    "vNetworkAddressPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "The address range of the vNet in CIDR format"
+      },
+      "defaultValue": "10.99.1.0/24"
+    },
+    "subnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the subnet created in the vNet"
+      },
+      "defaultValue": "DefaultSubnet"
+    },
+    "subnetAddressPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "The address range of the subnet created in the vNet"
+      },
+      "defaultValue": "10.99.0.0/24"
     },
     "_artifactsLocation": {
       "type": "string",
