@@ -96,7 +96,7 @@
     "gwDomainNameLabel": "lsbprdgw-test1",
     "gwPublicIPAddressName": "rdgw-pip",
     "gwLoadBalancerName": "gwLoadBalancer",
-    
+
     "gwLoadBalancerFEName": "[concat(variables('gwLoadBalancerName'),'FE')]",
     "gwLoadBalancerBEName": "[concat(variables('gwLoadBalancerName'),'BE')]",
     "gwPublicIPAddressRef": "[resourceId('Microsoft.Network/publicIPAddresses',variables('gwPublicIPAddressName'))]",
@@ -419,7 +419,7 @@
       "apiVersion": "[variables('networkApi')]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[variables('gwlbID')]",
+        "[variables('gwLoadBalancerRef')]",
         "Microsoft.Resources/deployments/vNetwork"
       ],
       "properties": {
