@@ -85,24 +85,30 @@
     }
   },
   "variables": {
+    "computeApi":  "2017-03-30",
+    "networkApi":  "2017-03-01",
+    "resourceApi": "2017-05-10",
+
     "cbVmName": "rdcb",
     "gwVmName": "rdgw",
     "shVmName": "rdsh",
+
     "gwDomainNameLabel": "lsbprdgw-test1",
     "gwPublicIPAddressName": "rdgw-pip",
     "gwLoadBalancerName": "gwLoadBalancer",
-    "gwLoadBalancerFE": "gwLoadBalancerFE",
-    "gwLoadBalancerBE": "gwLoadBalancerFE",
-    "gwPublicIPAddressID": "[resourceId('Microsoft.Network/publicIPAddresses',variables('gwPublicIPAddressName'))]",
-    "gwLoadBalancerID": "[resourceId('Microsoft.Network/loadBalancers',variables('gwLoadBalancerName'))]",
-    "gwLoadBalancerFEConfigID": "[concat(variables('gwLoadBalancerID'),'/frontendIPConfigurations/',variables('gwLoadBalancerFE'))]",
-    "gwLoadBalancerBEAddressPoolID": "[concat(variables('gwLoadBalancerID'),'/backendAddressPools/',variables('gwLoadBalancerBE'))]"
+    
+    "gwLoadBalancerFEName": "[concat(variables('gwLoadBalancerName'),'FE')]",
+    "gwLoadBalancerBEName": "[concat(variables('gwLoadBalancerName'),'BE')]",
+    "gwPublicIPAddressRef": "[resourceId('Microsoft.Network/publicIPAddresses',variables('gwPublicIPAddressName'))]",
+    "gwLoadBalancerRef": "[resourceId('Microsoft.Network/loadBalancers',variables('gwLoadBalancerName'))]",
+    "gwLoadBalancerFEConfigRef": "[concat(variables('gwLoadBalancerRef'),'/frontendIPConfigurations/',variables('gwLoadBalancerFEName'))]",
+    "gwLoadBalancerBEAddressPoolRef": "[concat(variables('gwLoadBalancerRef'),'/backendAddressPools/',variables('gwLoadBalancerBEName'))]"
   },
   "resources": [
     {
       "type": "Microsoft.Resources/deployments",
       "name": "vNetwork",
-      "apiVersion": "2017-05-10",
+      "apiVersion": "[variables('resourceApi')]",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -129,7 +135,7 @@
       "name": "[variables('gwPublicIPAddressName')]",
       "type": "Microsoft.Network/publicIPAddresses",
       "location": "[resourceGroup().location]",
-      "apiVersion": "2015-06-15",
+      "apiVersion": "[variables('networkApi')]",
       "dependsOn": [
         "Microsoft.Resources/deployments/vNetwork"
       ],
@@ -143,25 +149,25 @@
     {
       "name": "[variables('gwLoadBalancerName')]",
       "type": "Microsoft.Network/loadBalancers",
-      "apiVersion": "2017-03-01",
+      "apiVersion": "[variables('networkApi')]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[variables('gwIPAddressID')]"
+        "[variables('gwPublicIPAddressRef')]"
       ],
       "properties": {
         "frontendIPConfigurations": [
           {
-            "name": "[variables('gwLoadBalancerFE')]",
+            "name": "[variables('gwLoadBalancerFEName')]",
             "properties": {
               "publicIPAddress": {
-                "id": "[variables('gwPublicIPAddressID')]"
+                "id": "[variables('gwPublicIPAddressRef')]"
               }
             }
           }
         ],
         "backendAddressPools": [
           {
-            "name": "[variables('gwLoadBalancerBE')]"
+            "name": "[variables('gwLoadBalancerBEName')]"
           }
         ],
         "loadBalancingRules": [
@@ -169,10 +175,10 @@
             "name": "Rule01",
             "properties": {
               "frontendIPConfiguration": {
-                "id": "[variables('gwLoadBalancerFEConfigID')]"
+                "id": "[variables('gwLoadBalancerFEConfigRef')]"
               },
               "backendAddressPool": {
-                "id": "[variables('gwLoadBalancerBEAddressPoolID')]"
+                "id": "[variables('gwLoadBalancerBEAddressPoolRef')]"
               },
               "protocol": "Tcp",
               "frontendPort": 443,
@@ -181,7 +187,7 @@
               "idleTimeoutInMinutes": 5,
               "loadDistribution": "SourceIPProtocol",
               "probe": {
-                "id": "[concat(variables('gwLoadBalancerID'),'/probes/tcpProbe01')]"
+                "id": "[concat(variables('gwLoadBalancerRef'),'/probes/tcpProbe01')]"
               }
             }
           },
@@ -189,10 +195,10 @@
             "name": "Rule02",
             "properties": {
               "frontendIPConfiguration": {
-                "id": "[variables('gwLoadBalancerFEConfigID')]"
+                "id": "[variables('gwLoadBalancerFEConfigRef')]"
               },
               "backendAddressPool": {
-                "id": "[variables('gwLoadBalancerBEAddressPoolID')]"
+                "id": "[variables('gwLoadBalancerBEAddressPoolRef')]"
               },
               "protocol": "Udp",
               "frontendPort": 3391,
@@ -201,7 +207,7 @@
               "idleTimeoutInMinutes": 5,
               "loadDistribution": "SourceIPProtocol",
               "probe": {
-                "id": "[concat(variables('gwLoadBalancerID'),'/probes/tcpProbe02')]"
+                "id": "[concat(variables('gwLoadBalancerRef'),'/probes/tcpProbe02')]"
               }
             }
           }
@@ -245,7 +251,7 @@
     {
       "type": "Microsoft.Network/networkInterfaces",
       "name": "[concat(variables('shVmName'),copyindex(),'-if')]",
-      "apiVersion": "2017-03-01",
+      "apiVersion": "[variables('networkApi')]",
       "location": "[resourceGroup().location]",
       "copy": {
         "name": "sh-if-loop",
@@ -271,7 +277,7 @@
     {
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[concat(variables('shVmName'), copyindex())]",
-      "apiVersion": "2017-03-30",
+      "apiVersion": "[variables('computeApi')]",
       "location": "[resourceGroup().location]",
       "copy": {
         "name": "sh-vm-loop",
@@ -315,7 +321,7 @@
         {
           "type": "extensions",
           "name": "[concat(variables('shVmName'), copyindex(), '/sessionHost')]",
-          "apiVersion": "2017-03-30",
+          "apiVersion": "[variables('computeApi')]",
           "location": "[resourceGroup().location]",
           "dependsOn": [
             "[resourceId('Microsoft.Compute/virtualMachines', variables('gwVmName'))]"
@@ -348,7 +354,7 @@
     {
       "type": "Microsoft.Network/networkInterfaces",
       "name": "[concat(variables('cbVmName'),'-if')]",
-      "apiVersion": "2017-03-01",
+      "apiVersion": "[variables('networkApi')]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
         "Microsoft.Resources/deployments/vNetwork"
@@ -370,7 +376,7 @@
     {
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[variables('cbVmName')]",
-      "apiVersion": "2017-03-30",
+      "apiVersion": "[variables('computeApi')]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('cbVmName'),'-if'))]"
@@ -410,7 +416,7 @@
     {
       "type": "Microsoft.Network/networkInterfaces",
       "name": "[concat(variables('gwVmName'),'-if')]",
-      "apiVersion": "2017-03-01",
+      "apiVersion": "[variables('networkApi')]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
         "[variables('gwlbID')]",
@@ -426,10 +432,10 @@
                 "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vNetworkName'), parameters('subnetName'))]"
               },
               "loadBalancerBackendAddressPools": [{
-                "id": "[variables('gwLoadBalancerBEAddressPoolID')]"
+                "id": "[variables('gwLoadBalancerBEAddressPoolRef')]"
               }],
               "loadBalancerInboundNatRules": [{
-                "id": "[concat(variables('gwLoadBalancerID'),'/inboundNatRules/rdp')]"
+                "id": "[concat(variables('gwLoadBalancerRef'),'/inboundNatRules/rdp')]"
               }]
             }
           }
@@ -439,7 +445,7 @@
     {
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[variables('gwVmName')]",
-      "apiVersion": "2017-03-30",
+      "apiVersion": "[variables('computeApi')]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('gwVmName'),'-if'))]"
@@ -479,7 +485,7 @@
         {
           "type": "extensions",
           "name": "[concat(variables('gwVmName'),'/gateway')]",
-          "apiVersion": "2017-03-30",
+          "apiVersion": "[variables('computeApi')]",
           "location": "[resourceGroup().location]",
           "dependsOn": [
             "[resourceId('Microsoft.Compute/virtualMachines', variables('gwVmName'))]"
@@ -512,7 +518,7 @@
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
       "name": "[concat(variables('cbVmName'),'/deployment')] ",
-      "apiVersion": "2015-06-15",
+      "apiVersion": "[variables('computeApi')]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
         "[resourceId('Microsoft.Compute/virtualMachines',variables('cbVmName'))]",
