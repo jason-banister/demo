@@ -67,8 +67,7 @@
     "revokedCertName": "RevokedCerts",
     "revokedCertThumbprint": "",
 
-    "vNetworkID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('vNetworkName'))]",
-    "gatewaySubnetRef": "[concat(parameters('vNetworkID'),'/subnets/','GatewaySubnet')]"
+    "gatewaySubnetRef": "[concat(resourceId('Microsoft.Network/virtualNetworks',parameters('vNetworkName')),'/subnets/','GatewaySubnet')]"
   },
   "resources": [
     {

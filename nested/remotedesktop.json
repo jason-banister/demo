@@ -62,6 +62,13 @@
       },
       "defaultValue": "10.99.1.0/24"
     },
+    "sessionHostInstances": {
+      "type": "int",
+      "metadata": {
+        "description": "The number of session hosts to be deployed in the Default Collection"
+      },
+      "defaultValue": "1"
+    },
     "_artifactsLocation": {
       "type": "string",
       "metadata": {
@@ -242,7 +249,7 @@
       "location": "[resourceGroup().location]",
       "copy": {
         "name": "sh-if-loop",
-        "count": "[parameters('shInstances')]"
+        "count": "[parameters('sessionHostInstances')]"
       },
       "dependsOn": [
         "Microsoft.Resources/deployments/vNetwork"
@@ -268,7 +275,7 @@
       "location": "[resourceGroup().location]",
       "copy": {
         "name": "sh-vm-loop",
-        "count": "[parameters('shInstances')]"
+        "count": "[parameters('sessionHostInstances')]"
       },
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('shVmName'),copyindex(),'-if'))]"
@@ -530,7 +537,7 @@
             "DomainName": "[parameters('domainName')]",
             "ExternalFQDN": "[reference(variables('gatewayPublicIPAddressID')).dnsSettings.fqdn]",
 
-            "numberOfRdshInstances": "[parameters('numberOfRdshInstances')]",
+            "numberOfRdshInstances": "[parameters('sessionHostInstances')]",
             "sessionHostNamingPrefix": "rdsh-",
 
             "WebAccessServer": "[concat(variables('gwVmName'),'.',parameters('domainName'))]"

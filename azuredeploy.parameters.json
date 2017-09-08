@@ -2,8 +2,14 @@
   "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "localAdminUsername": {
+      "value": "LocalAdmin"
+    },
+    "localAdminPassword": {
+      "value": "5up3R53cR3T"
+    },
     "domainAdminUsername": {
-      "value": "AzAdmin"
+      "value": "AzureAdmin"
     },
     "domainAdminPassword": {
       "value": "5up3R53cR3T"

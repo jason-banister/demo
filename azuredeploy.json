@@ -115,10 +115,10 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "adminUsername": {
+          "domainAdminUsername": {
             "value": "[parameters('domainAdminUsername')]"
           },
-          "adminPassword": {
+          "domainAdminPassword": {
             "value": "[parameters('domainAdminPassword')]"
           },
           "domainFqdn": {
